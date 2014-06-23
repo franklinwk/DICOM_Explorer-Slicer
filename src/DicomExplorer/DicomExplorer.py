@@ -7,8 +7,8 @@ from LeapLib.Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGe
 
 class DicomExplorer:
   def __init__(self, parent):
-    parent.title = "DICOM Explorer"
-    parent.categories = ["DICOM"]
+    parent.title = "DICOM_Explorer"
+    parent.categories = ["DICOM "]
     parent.contributors = ["Franklin King (Queen's University), Saskia Camps (Brigham)"]
     parent.helpText = """
     Add help text
@@ -24,7 +24,7 @@ class DicomExplorer:
 #
 class DicomExplorerWidget:
   def __init__(self, parent = None):
-    self.path = os.path.dirname(slicer.modules.DicomExplorer.path)
+    self.path = os.path.dirname(slicer.modules.dicomexplorer.path)
     if not parent:
       self.parent = slicer.qMRMLWidget()
       self.parent.setLayout(qt.QVBoxLayout())
