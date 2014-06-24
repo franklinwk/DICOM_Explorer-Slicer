@@ -79,6 +79,20 @@ class DicomExplorerBrowser(qt.QDialog):
     
   def populateBrowser(self):
     #Take in a list of scalar volume nodes that have DICOM data
+    collection=slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')#slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')
+    numberItems=collection.GetNumberOfItems()
+    for i in range(numberItems):
+      scalarVolumeNode=collection.GetItemAsObject(i)
+      nodeID=scalarVolumeNode.GetID()
+      IDFirstSlice=scalarVolumeNode.GetAttribute("DICOM.instanceUIDs").split()  
+      IDFirstSlice=IDFirstSlice[0]
+      if IDFirstSlice not in self.currentVolumeIDList:
+        self.currentVolumeIDList.append(IDFirstSlice)
+        self.currentVolumeNodeList.append(scalarVolumeNode)  # Or nodeID
+      
+      
+      
+      
     
     #Temp
     for image in self.currentVolumeNodeList:
