@@ -55,7 +55,10 @@ class DicomExplorerWidget:
     connectorLayout.addRow(self.stopButton)
     
     self.browserButton = qt.QPushButton("Open Browser")
-    connectorLayout.addRow(self.browserButton)    
+    connectorLayout.addRow(self.browserButton)
+    
+    self.tempButton = qt.QPushButton("Temp")
+    connectorLayout.addRow(self.tempButton)    
     
     # Debug box
     self.textBox = qt.QTextEdit()
@@ -67,7 +70,8 @@ class DicomExplorerWidget:
     #Connections
     self.startButton.connect('clicked(bool)', self.onStart)
     self.stopButton.connect('clicked(bool)', self.onStop)
-    self.browserButton.connect('clicked(bool)', self.onOpenBrowser)    
+    self.browserButton.connect('clicked(bool)', self.onOpenBrowser)
+    self.tempButton.connect('clicked(bool)', self.onTemp)   
     
     # Instantiate timer
     self.timer = qt.QTimer()
@@ -85,9 +89,15 @@ class DicomExplorerWidget:
   
   def onStop(self):
     self.timer.stop()
+
+  def onTemp(self):
+    self.browser.populateBrowser([])
     
   def onOpenBrowser(self):
     self.browser = DicomExplorerBrowser(self.parent)
+    pal = self.browser.palette
+    pal.setColor(self.browser.backgroundRole(), qt.QColor(20,20,20))
+    self.browser.setPalette(pal)
     #self.browser.setWindowFlags(qt.Qt.FramelessWindowHint)
     self.browser.show()
   
@@ -108,7 +118,11 @@ class DicomExplorerWidget:
     
   def frameUpdate(self):
     logic = DicomExplorerLogic()
-
+    frame = self.controller.frame()
+    lastFrame = self.controller.frame(1)
+    fingerList = self.extended_fingers(frame.fingers)
+    self.textBox.setPlainText("Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (frame.id, frame.timestamp, len(frame.hands), len(fingerList), len(frame.tools), len(frame.gestures())))
+    
 
 #
 # DicomExplorerLogic
