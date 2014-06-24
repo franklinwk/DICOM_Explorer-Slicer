@@ -33,11 +33,11 @@ class DicomExplorerBrowser(qt.QDialog):
     pass
   
   def setup(self):
-    self.tempLayout = qt.QFormLayout(self) #change to whatever layout is suitable, is any layout suitable? maybe not, I don't know right now    
+    self.browserLayout = qt.QFormLayout(self) #change to whatever layout is suitable, is any layout suitable? maybe not, I don't know right now    
     
     
     self.tempLabel2 = qt.QLabel()
-    self.tempLayout.addWidget(self.tempLabel2)    
+    self.browserLayout.addWidget(self.tempLabel2)    
     
     #self.currentVolumeNodeList.append(slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1"))
     #self.tempLabel2.setText("<font color='white'>" + slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1").GetAttribute("DICOM.patient") + "\n" + slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1").GetAttribute("DICOM.date"))
@@ -95,6 +95,8 @@ class DicomExplorerBrowser(qt.QDialog):
     #access qtImage pixel data, copy in imageData pixel data for a specific slice
     #Spacing will need to be taken into account, but I want to get it working like this first
     
+    
+
   def populateBrowser(self):
     #Take in a list of scalar volume nodes that have DICOM data
     collection=slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')
@@ -110,8 +112,10 @@ class DicomExplorerBrowser(qt.QDialog):
         currentVolumeIDList.append(IDFirstSlice)
         date=scalarVolumeNode.GetAttribute("DICOM.date")
         time=scalarVolumeNode.GetAttribute("DICOM.time")
-        totalList.append([date,time,scalarVolumeNode])
-
+        imageLabel = qt.QLabel()
+        self.browserLayout.addWidget(imageLabel)
+        totalList.append([date,time,scalarVolumeNode,imageLabel])
+        
       totalListSorted=sorted(totalList,key = lambda x: (x[1], x[2]),reverse=True)D
       
     
