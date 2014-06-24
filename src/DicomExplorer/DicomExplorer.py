@@ -54,6 +54,8 @@ class DicomExplorerWidget:
     self.stopButton = qt.QPushButton("Stop Recording")
     connectorLayout.addRow(self.stopButton)
     
+    self.browserButton = qt.QPushButton("Open Browser")
+    connectorLayout.addRow(self.browserButton)    
     
     # Debug box
     self.textBox = qt.QTextEdit()
@@ -65,6 +67,7 @@ class DicomExplorerWidget:
     #Connections
     self.startButton.connect('clicked(bool)', self.onStart)
     self.stopButton.connect('clicked(bool)', self.onStop)
+    self.browserButton.connect('clicked(bool)', self.onOpenBrowser)    
     
     # Instantiate timer
     self.timer = qt.QTimer()
@@ -82,6 +85,11 @@ class DicomExplorerWidget:
   
   def onStop(self):
     self.timer.stop()
+    
+  def onOpenBrowser(self):
+    self.browser = DicomExplorerBrowser(self.parent)
+    #self.browser.setWindowFlags(qt.Qt.FramelessWindowHint)
+    self.browser.show()
   
   def extended_fingers(self, fingerList):
     extendedFingerList = []
