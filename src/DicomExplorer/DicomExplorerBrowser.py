@@ -9,6 +9,7 @@ class DicomExplorerBrowser(qt.QDialog):
   def __init__(self, parent):
     qt.QDialog.__init__(self, parent)
     self.currentVolumeNodeList = []
+    self.currentVolumeIDList = []
     self.setup()
     
   def setup(self):
@@ -30,6 +31,20 @@ class DicomExplorerBrowser(qt.QDialog):
     
   def populateBrowser(self, volumeNodeList):
     #Take in a list of scalar volume nodes that have DICOM data
+    collection=slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')#slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')
+    numberItems=collection.GetNumberOfItems()
+    for i in range(numberItems):
+      scalarVolumeNode=collection.GetItemAsObject(i)
+      nodeID=scalarVolumeNode.GetID()
+      IDFirstSlice=scalarVolumeNode.GetAttribute("DICOM.instanceUIDs").split()  
+      IDFirstSlice=IDFirstSlice[0]
+      if IDFirstSlice not in self.currentVolumeIDList:
+        self.currentVolumeIDList.append(IDFirstSlice)
+        self.currentVolumeNodeList.append(scalarVolumeNode)  # Or nodeID
+      
+      
+      
+      
     
     #Compare with volumeNodeList here, can keep in Node format for the dicom data, but it might be less efficient
     #Add in any series that does not appear in self.currentVolmeNodeList
