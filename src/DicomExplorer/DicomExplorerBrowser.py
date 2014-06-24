@@ -95,21 +95,24 @@ class DicomExplorerBrowser(qt.QDialog):
     #access qtImage pixel data, copy in imageData pixel data for a specific slice
     #Spacing will need to be taken into account, but I want to get it working like this first
     
-    
   def populateBrowser(self):
     #Take in a list of scalar volume nodes that have DICOM data
-    collection=slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')#slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')
+    collection=slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')
     numberItems=collection.GetNumberOfItems()
+    currentVolumeIDList=[]
+    totalList=[]
     for i in range(numberItems):
       scalarVolumeNode=collection.GetItemAsObject(i)
       nodeID=scalarVolumeNode.GetID()
-      IDFirstSlice=scalarVolumeNode.GetAttribute("DICOM.instanceUIDs").split()  
+      IDFirstSlice=scalarVolumeNode.GetAttribute("DICOM.instanceUIDs").split()
       IDFirstSlice=IDFirstSlice[0]
-      if IDFirstSlice not in self.currentVolumeIDList:
-        self.currentVolumeIDList.append(IDFirstSlice)
-        imageLabel = qt.QLabel()
-        self.tempLayout.addWidget(imageLabel)
-        self.currentVolumeNodeList.append((scalarVolumeNode,imageLabel))  # Or nodeID
+      if IDFirstSlice not in currentVolumeIDList:
+        currentVolumeIDList.append(IDFirstSlice)
+        date=scalarVolumeNode.GetAttribute("DICOM.date")
+        time=scalarVolumeNode.GetAttribute("DICOM.time")
+        totalList.append([date,time,scalarVolumeNode])
+
+      totalListSorted=sorted(totalList,key = lambda x: (x[1], x[2]),reverse=True)D
       
     
     #Compare with volumeNodeList here, can keep in Node format for the dicom data, but it might be less efficient
