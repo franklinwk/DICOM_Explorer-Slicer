@@ -91,7 +91,7 @@ class DicomExplorerWidget:
     self.timer.stop()
 
   def onTemp(self):
-    self.browser.populateBrowser([])
+    self.browser.populateBrowser()
     
   def onOpenBrowser(self):
     self.browser = DicomExplorerBrowser(self.parent)
