@@ -9,7 +9,7 @@ class DicomExplorerBrowser(qt.QDialog):
   def __init__(self, parent):
     qt.QDialog.__init__(self, parent)
     
-    self.currentVolumeNodeList = []
+    self.totalListSorted = []
     self.currentVolumeIDList = []
     self.offsetPortion = 0.1
     self.setup()
@@ -21,23 +21,33 @@ class DicomExplorerBrowser(qt.QDialog):
     else:
       self.offsetPortion = self.offsetPortion + 0.2
     
-    #Temp
-    for (node,label) in self.currentVolumeNodeList:
-      image = self.vtkImageDataToQImage(node.GetImageData())
-      label.setPixmap(qt.QPixmap.fromImage(image))    
+
+    for node in self.totalListSorted:
+      image = self.vtkImageDataToQImage(node[2].GetImageData())
+      node[3].setPixmap(qt.QPixmap.fromImage(image))
     
     
     #Go through volume node list and extract vtkImageData from them with relevant fixes (spacing, etc.)
     #Iterate (or repeat) some range of numbers representing which slice of each image should be previewed (based on percentage, so they all repeat the animation in sync)
     #use vtkImageDataToQImage to convert at the correct slice location, then display at correct position in layout
-    pass
   
   def setup(self):
-    self.browserLayout = qt.QFormLayout(self) #change to whatever layout is suitable, is any layout suitable? maybe not, I don't know right now    
+    self.browserLayout = qt.QVBoxLayout(self) #change to whatever layout is suitable, is any layout suitable? maybe not, I don't know right now    
+    self.scrollArea = qt.QScrollArea(self)
+    self.scrollArea.setWidgetResizable(True)
+    self.scrollArea.setHorizontalScrollBarPolicy(qt.Qt.ScrollBarAlwaysOff)
+    self.scrollArea.setVerticalScrollBarPolicy(qt.Qt.ScrollBarAlwaysOff)
     
+    self.viewport = qt.QWidget(self)
+    self.scrollArea.setWidget(self.viewport)
     
-    self.tempLabel2 = qt.QLabel()
-    self.browserLayout.addWidget(self.tempLabel2)    
+    self.scrollLayout = qt.QGridLayout(self.viewport)
+    self.viewport.setLayout(self.scrollLayout)
+    
+    self.tempLabel2 = qt.QLabel("testing")
+    self.scrollLayout.addWidget(self.tempLabel2)    
+    
+    self.browserLayout.addWidget(self.scrollArea)
     
     #self.currentVolumeNodeList.append(slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1"))
     #self.tempLabel2.setText("<font color='white'>" + slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1").GetAttribute("DICOM.patient") + "\n" + slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1").GetAttribute("DICOM.date"))
@@ -112,25 +122,22 @@ class DicomExplorerBrowser(qt.QDialog):
         time=scalarVolumeNode.GetAttribute("DICOM.time")
         description=scalarVolumeNode.GetAttribute("DICOM.modality")+"-"+scalarVolumeNode.GetAttribute("DICOM.seriesDescription")
         imageLabel = qt.QLabel()
-        self.browserLayout.addWidget(imageLabel)
+        #self.scrollLayout.addWidget(imageLabel)      
         totalList.append([date,time,scalarVolumeNode,imageLabel,description])
-        
-      totalListSorted=sorted(totalList,key = lambda x: (x[1], x[2]),reverse=True)D
-      
-    
+        self.GenerateBlock([date,time,scalarVolumeNode,imageLabel,description])
+      self.totalListSorted=sorted(totalList,key = lambda x: (x[1], x[2]),reverse=True)
+
     #Compare with volumeNodeList here, can keep in Node format for the dicom data, but it might be less efficient
     #Add in any series that does not appear in self.currentVolmeNodeList
-    pass
 
-  def GenerateBlock(self,totalListSorted):
+  def GenerateBlock(self,newNodeData):
     #Method1
-    for i in len(totalListSorted):
-      Block=qt.QGroupBox(totalListSorted[i][4])
-      imageLabel=qt.QLabel()
-      vbox=qt.QVBoxLayout()
-      vbox.addWidget(imageLabel)
-      Block.setLayout(vbox)
-      self.browserLayout.addWidget(Block,0,0) ### Position still needs to be set!!!
+
+    Block=qt.QGroupBox(newNodeData[4])
+    vbox=qt.QVBoxLayout()
+    vbox.addWidget(newNodeData[3])
+    Block.setLayout(vbox)
+    self.scrollLayout.addWidget(Block,0,0) ### Position still needs to be set!!!
 
 ##    #Method2
 ##    for i in len(totalListSorted):
@@ -141,14 +148,16 @@ class DicomExplorerBrowser(qt.QDialog):
 ##        vbox.addWidget(textLabel)
 ##        vbox.addWidget(imageLabel)
 ##        Block.setLayout(vbox)
-##        self.browserLayout.addWidget(Block, 2, 0)###Position still needs to be set
+##        self.scrollLayout.addWidget(Block, 2, 0)###Position still needs to be set
       
     
-      
-    
-    
-    
+
   def updateNodeList(self, volumeNodeList):
 
     pass
     
+    
+  def scrollBrowser(self, value):
+    current = self.scrollArea.verticalScrollBar().value
+    self.scrollArea.verticalScrollBar().setValue(current + value)
+

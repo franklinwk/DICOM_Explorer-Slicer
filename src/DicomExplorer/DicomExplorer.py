@@ -123,6 +123,13 @@ class DicomExplorerWidget:
     fingerList = self.extended_fingers(frame.fingers)
     self.textBox.setPlainText("Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (frame.id, frame.timestamp, len(frame.hands), len(fingerList), len(frame.tools), len(frame.gestures())))
     
+    extendedFrameLeftFingers = self.extended_fingers(frame.hands.leftmost.fingers)
+    lastFrameLeftFingers = self.extended_fingers(lastFrame.hands.leftmost.fingers)
+  
+    if (len(frame.hands) == 1 and len(extendedFrameLeftFingers) <= 2 and len(extendedFrameLeftFingers) > 0 and len(lastFrameLeftFingers) <= 2 and frame.hands.leftmost.confidence >= 0.2):
+      self.browser.scrollBrowser(frame.hands.leftmost.fingers.frontmost.tip_position.y - lastFrame.hands.leftmost.fingers.frontmost.tip_position.y)
+
+    
 
 #
 # DicomExplorerLogic
