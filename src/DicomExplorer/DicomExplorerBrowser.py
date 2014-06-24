@@ -95,8 +95,6 @@ class DicomExplorerBrowser(qt.QDialog):
     #access qtImage pixel data, copy in imageData pixel data for a specific slice
     #Spacing will need to be taken into account, but I want to get it working like this first
     
-    
-
   def populateBrowser(self):
     #Take in a list of scalar volume nodes that have DICOM data
     collection=slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')
@@ -112,9 +110,10 @@ class DicomExplorerBrowser(qt.QDialog):
         currentVolumeIDList.append(IDFirstSlice)
         date=scalarVolumeNode.GetAttribute("DICOM.date")
         time=scalarVolumeNode.GetAttribute("DICOM.time")
+        description=scalarVolumeNode.GetAttribute("DICOM.modality")+"-"+scalarVolumeNode.GetAttribute("DICOM.seriesDescription")
         imageLabel = qt.QLabel()
         self.browserLayout.addWidget(imageLabel)
-        totalList.append([date,time,scalarVolumeNode,imageLabel])
+        totalList.append([date,time,scalarVolumeNode,imageLabel,description])
         
       totalListSorted=sorted(totalList,key = lambda x: (x[1], x[2]),reverse=True)D
       
@@ -123,6 +122,32 @@ class DicomExplorerBrowser(qt.QDialog):
     #Add in any series that does not appear in self.currentVolmeNodeList
     pass
 
+  def GenerateBlock(self,totalListSorted):
+    #Method1
+    for i in len(totalListSorted):
+      Block=qt.QGroupBox(totalListSorted[i][4])
+      imageLabel=qt.QLabel()
+      vbox=qt.QVBoxLayout()
+      vbox.addWidget(imageLabel)
+      Block.setLayout(vbox)
+      self.browserLayout.addWidget(Block,0,0) ### Position still needs to be set!!!
+
+##    #Method2
+##    for i in len(totalListSorted):
+##        Block=qt.QWidget()
+##        textLabel=qt.QLabel(totalListSorted[i][4])
+##        imageLabel=qt.QLabel()
+##        vbox = qt.QVBoxLayout()
+##        vbox.addWidget(textLabel)
+##        vbox.addWidget(imageLabel)
+##        Block.setLayout(vbox)
+##        self.browserLayout.addWidget(Block, 2, 0)###Position still needs to be set
+      
+    
+      
+    
+    
+    
   def updateNodeList(self, volumeNodeList):
 
     pass
