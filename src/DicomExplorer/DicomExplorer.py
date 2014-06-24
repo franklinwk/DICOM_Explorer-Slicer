@@ -91,9 +91,6 @@ class DicomExplorerWidget:
   def onStop(self):
     self.timer.stop()
 
-  def onTemp(self):
-    self.browser.populateBrowser()
-    
   def onOpenBrowser(self):
     self.browser = Widgets.DicomExplorerBrowser(self.parent)
     pal = self.browser.palette
@@ -101,6 +98,9 @@ class DicomExplorerWidget:
     self.browser.setPalette(pal)
     #self.browser.setWindowFlags(qt.Qt.FramelessWindowHint)
     self.browser.show()
+    
+  def onTemp(self):
+    self.browser.populateBrowser()    
   
   def extended_fingers(self, fingerList):
     extendedFingerList = []
