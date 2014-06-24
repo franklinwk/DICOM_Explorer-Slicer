@@ -1,4 +1,5 @@
 from __main__ import math, vtk, qt, ctk, slicer
+import Widgets
 import LeapLib.Leap
 from LeapLib.Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 #
@@ -94,7 +95,7 @@ class DicomExplorerWidget:
     self.browser.populateBrowser()
     
   def onOpenBrowser(self):
-    self.browser = DicomExplorerBrowser(self.parent)
+    self.browser = Widgets.DicomExplorerBrowser(self.parent)
     pal = self.browser.palette
     pal.setColor(self.browser.backgroundRole(), qt.QColor(20,20,20))
     self.browser.setPalette(pal)

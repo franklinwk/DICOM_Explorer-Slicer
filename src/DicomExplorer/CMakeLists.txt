@@ -11,7 +11,9 @@ include(${Slicer_USE_FILE})
 #-----------------------------------------------------------------------------
 set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}.py
-  ${MODULE_NAME}Browser
+  Widgets/__init__
+  Widgets/${MODULE_NAME}Browser
+  Widgets/${MODULE_NAME}DateBlock
   )
 
 set(MODULE_PYTHON_RESOURCES
