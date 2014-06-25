@@ -59,7 +59,7 @@ class DicomExplorerWidget:
     self.schemeBrowserSelector = ctk.ctkComboBox()
     self.schemeBrowserSelector.addItem('%s. Pointer Browser' % 0)
     self.schemeBrowserSelector.addItem('%s. Spinner Browser' % 1)
-    schemeSliceLayout.addRow("Browser Type:", self.schemeBrowserSelector)
+    connectorLayout.addRow("Browser Type:", self.schemeBrowserSelector)
     
     self.browserButton = qt.QPushButton("Open Browser")
     connectorLayout.addRow(self.browserButton)  
