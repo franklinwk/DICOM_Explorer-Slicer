@@ -118,34 +118,14 @@ class DicomExplorerWidget:
   def onUpdate(self):
     self.browser.populateBrowser()    
   
-  def extended_fingers(self, fingerList):
-    extendedFingerList = []
-    for finger in fingerList:
-      if finger.is_extended is True:
-        extendedFingerList.append(finger)
-    return extendedFingerList
-  
-  def countKeyTaps(self, frame, previousFrameWindow):
-    gestureList = frame.gestures(previousFrameWindow)
-    count = 0
-    for gesture in gestureList:
-      if gesture.type == gesture.TYPE_KEY_TAP:
-        count = count + 1
-    return count
-    
   def frameUpdate(self):
     logic = DicomExplorerLogic()
     frame = self.controller.frame()
-    lastFrame = self.controller.frame(1)
-    fingerList = self.extended_fingers(frame.fingers)
-    self.textBox.setPlainText("Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (frame.id, frame.timestamp, len(frame.hands), len(fingerList), len(frame.tools), len(frame.gestures())))
+    lastFrame = self.controller.frame(1)    
     
-    extendedFrameLeftFingers = self.extended_fingers(frame.hands.leftmost.fingers)
-    lastFrameLeftFingers = self.extended_fingers(lastFrame.hands.leftmost.fingers)
-  
-    if (len(frame.hands) == 1 and len(extendedFrameLeftFingers) <= 2 and len(extendedFrameLeftFingers) > 0 and len(lastFrameLeftFingers) <= 2 and frame.hands.leftmost.confidence >= 0.2):
-      self.browser.scrollBrowser(2*(frame.hands.leftmost.fingers.frontmost.tip_position.y - lastFrame.hands.leftmost.fingers.frontmost.tip_position.y))
-
+    debugInfo = self.browser.leapUpdate(frame, lastFrame)
+    self.textBox.setPlainText(debugInfo)
+    
 
 #
 # DicomExplorerLogic
