@@ -10,6 +10,7 @@ class DicomExplorerBrowser(qt.QDialog):
     self.totalListSorted = []
     self.currentVolumeIDList = []
     self.offsetPortion = 0.1
+    self.dateBlockDict = {}
     self.setup()
   
   def updateBrowser(self):
@@ -19,10 +20,9 @@ class DicomExplorerBrowser(qt.QDialog):
     else:
       self.offsetPortion = self.offsetPortion + 0.2
     
-
-    for imageBlock in self.totalListSorted:
-      imageBlock.updateImageLabel(self.offsetPortion)
-    
+    for date in self.dateBlockDict:
+      for imageBlock in self.dateBlockDict[date].listImageBlocks:
+        imageBlock.updateImageLabel(self.offsetPortion)
     
     #Go through volume node list and extract vtkImageData from them with relevant fixes (spacing, etc.)
     #Iterate (or repeat) some range of numbers representing which slice of each image should be previewed (based on percentage, so they all repeat the animation in sync)
@@ -34,8 +34,6 @@ class DicomExplorerBrowser(qt.QDialog):
     self.scrollArea.setWidgetResizable(True)
     self.scrollArea.setHorizontalScrollBarPolicy(qt.Qt.ScrollBarAlwaysOff)
     self.scrollArea.setVerticalScrollBarPolicy(qt.Qt.ScrollBarAlwaysOff)
-    
-    print " this happened first"
     
     self.viewport = qt.QWidget(self)
     self.scrollArea.setWidget(self.viewport)
@@ -63,23 +61,24 @@ class DicomExplorerBrowser(qt.QDialog):
     #Take in a list of scalar volume nodes that have DICOM data
     collection=slicer.mrmlScene.GetNodesByClass('vtkMRMLScalarVolumeNode')
     numberItems=collection.GetNumberOfItems()
-    currentVolumeIDList=[]
     totalList=[]
     for i in range(numberItems):
       scalarVolumeNode=collection.GetItemAsObject(i)
       nodeID=scalarVolumeNode.GetID()
       IDFirstSlice=scalarVolumeNode.GetAttribute("DICOM.instanceUIDs").split()
       IDFirstSlice=IDFirstSlice[0]
-      if IDFirstSlice not in currentVolumeIDList:
-        currentVolumeIDList.append(IDFirstSlice)
+      if IDFirstSlice not in self.currentVolumeIDList:
+        self.currentVolumeIDList.append(IDFirstSlice)
         date=scalarVolumeNode.GetAttribute("DICOM.date")
         time=scalarVolumeNode.GetAttribute("DICOM.time")
         description=scalarVolumeNode.GetAttribute("DICOM.modality")+"-"+scalarVolumeNode.GetAttribute("DICOM.seriesDescription")
         
-        #for dateBlock in dateBlockList:
-        #  if dateBlock.date 
-        
-        #dateBlock = Widgets.DicomExplorerDateBlock(self)
+        if date not in  self.dateBlockDict:
+          dateBlock = Widgets.DicomExplorerDateBlock(self, date)
+          self.dateBlockDict[date] = dateBlock
+          self.scrollLayout.addWidget(dateBlock)
+        else:
+          dateBlock = self.dateBlockDict[date]
         
         imageBlock = Widgets.DicomExplorerImageBlock(self)
         imageBlock.setVolumeNode(scalarVolumeNode)
@@ -87,13 +86,10 @@ class DicomExplorerBrowser(qt.QDialog):
         imageBlock.setTime(time)
         imageBlock.setDescription(description)
         
-        #dateBlock.addImageBlock(imageBlock)
-        
-        
-        self.scrollLayout.addWidget(imageBlock)
+        dateBlock.loadImageBlock(time, imageBlock)
         
         #self.scrollLayout.addWidget(imageLabel)      
-        self.totalListSorted.append(imageBlock) # Temporary
+
         #totalList.append([date,time,scalarVolumeNode,imageLabel,description])
         #self.GenerateBlock([date,time,scalarVolumeNode,imageLabel,description])
       #self.totalListSorted=sorted(totalList,key = lambda x: (x[1], x[2]),reverse=True)

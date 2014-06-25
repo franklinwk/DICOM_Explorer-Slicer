@@ -13,7 +13,7 @@ set(MODULE_PYTHON_SCRIPTS
   ${MODULE_NAME}.py
   Widgets/__init__
   Widgets/${MODULE_NAME}Browser
-  #Widgets/${MODULE_NAME}DateBlock
+  Widgets/${MODULE_NAME}DateBlock
   Widgets/${MODULE_NAME}ImageBlock
   )
 

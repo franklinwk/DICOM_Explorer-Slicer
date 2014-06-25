@@ -25,9 +25,17 @@ class DicomExplorerImageBlock(qt.QWidget):
       return self.imageCache[offsetPortion]
     else:
       #Take into account orientation at some point, or to do this quickly, just assume the greatest dimension is the axial view for now
-      imageDataWidth = imageData.GetDimensions()[0] #take spacing into account later
-      imageDataHeight = imageData.GetDimensions()[1]
-      imageDataDepth = imageData.GetDimensions()[2]
+      imageDataDimensions = [0,0,0]
+      imageDataDimensions[0] = imageData.GetDimensions()[0] #take spacing into account later
+      imageDataDimensions[1] = imageData.GetDimensions()[1]
+      imageDataDimensions[2] = imageData.GetDimensions()[2]
+      
+      imageDataDepth = min(imageDataDimensions)
+      imageDataWidth = max(imageDataDimensions)
+      widthIndex = imageDataDimensions.index(imageDataWidth)
+      imageDataDimensions[widthIndex] = -1
+      imageDataHeight = max(imageDataDimensions)
+      heightIndex = imageDataDimensions.index(imageDataHeight)
       
       width = 50
       height = 50
@@ -36,6 +44,8 @@ class DicomExplorerImageBlock(qt.QWidget):
       if imageDataHeight < 50:
         height = imageDataHeight
       qtImage = qt.QImage(width, height)
+      
+      
       
       heightStep = imageDataHeight//height
       widthStep = imageDataWidth//width
@@ -51,8 +61,14 @@ class DicomExplorerImageBlock(qt.QWidget):
       #Could be more efficient if reimplemented mrmlUtils.vtkImageDataToQImage to take the slice, but cache seems to be enough
       for i in range(0,imageDataWidth-widthStep-1,widthStep):
         for j in range(0,imageDataHeight-heightStep-1,heightStep):
-          value = imageData.GetScalarComponentAsDouble(i,j,math.floor(imageDataDepth*offsetPortion),0)
-
+          #just using the largest two as length and width, spacing is not taken into account
+          if (widthIndex is 0 and heightIndex is 1) or (widthIndex is 1 and heightIndex is 0):
+            value = imageData.GetScalarComponentAsDouble(i,j,math.floor(imageDataDepth*offsetPortion),0)
+          elif (widthIndex is 1 and heightIndex is 2) or (widthIndex is 2 and heightIndex is 1):
+            value = imageData.GetScalarComponentAsDouble(math.floor(imageDataDepth*offsetPortion),i,j,0)
+          else:
+            value = imageData.GetScalarComponentAsDouble(i,math.floor(imageDataDepth*offsetPortion),j,0)
+          
           imageDataSlice.SetScalarComponentFromDouble(i//widthStep,j//heightStep,0,0,value/4)
           imageDataSlice.SetScalarComponentFromDouble(i//widthStep,j//heightStep,0,1,value/4)
           imageDataSlice.SetScalarComponentFromDouble(i//widthStep,j//heightStep,0,2,value/4)
