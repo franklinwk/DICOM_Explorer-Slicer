@@ -19,8 +19,10 @@ class DicomExplorerDateBlock(qt.QDialog):
         
     def loadImageBlock(self,blocktime,imageBlock):
         bisect.insort(self.timeList,blocktime)
+        self.timeList.sort(reverse=True)
+        
         ind=self.timeList.index(blocktime)
         self.listImageBlocks.append(imageBlock)
-        self.dateLayout.insertWidget(len(self.timeList)-ind+1,imageBlock)
+        self.dateLayout.insertWidget(ind+1,imageBlock)
         
 
