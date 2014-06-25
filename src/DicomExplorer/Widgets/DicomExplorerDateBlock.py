@@ -1,9 +1,9 @@
 from __main__ import math, vtk, qt, ctk, slicer
 import bisect
 
-class DicomExplorerDateBlock(qt.QDialog):
+class DicomExplorerDateBlock(qt.QWidget):
     def __init__(self, parent, Date):
-        qt.QDialog.__init__(self,parent)
+        qt.QWidget.__init__(self,parent)
         self.timeList=[]
         self.listImageBlocks=[]
         self.setup(Date)
@@ -24,5 +24,8 @@ class DicomExplorerDateBlock(qt.QDialog):
         ind=self.timeList.index(blocktime)
         self.listImageBlocks.append(imageBlock)
         self.dateLayout.insertWidget(ind+1,imageBlock)
+        self.dateLayout.setAlignment(Qt.AlignLeft)
+        self.dateLayout.addStretch(1)
+
         
 
