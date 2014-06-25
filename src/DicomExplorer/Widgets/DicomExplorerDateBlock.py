@@ -27,8 +27,6 @@ class DicomExplorerDateBlock(qt.QWidget):
         ind=self.timeList.index(blocktime)
         self.listImageBlocks.append(imageBlock)
         self.dateLayout.insertWidget(ind+1,imageBlock)
-        self.dateLayout.setAlignment(Qt.AlignLeft)
-        self.dateLayout.addStretch(1)
 
         
         
