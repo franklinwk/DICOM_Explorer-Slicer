@@ -55,11 +55,17 @@ class DicomExplorerWidget:
     self.stopButton = qt.QPushButton("Stop Recording")
     connectorLayout.addRow(self.stopButton)
     
-    self.browserButton = qt.QPushButton("Open Browser")
-    connectorLayout.addRow(self.browserButton)
+    #Buttons, boxes
+    self.schemeBrowserSelector = ctk.ctkComboBox()
+    self.schemeBrowserSelector.addItem('%s. Pointer Browser' % 0)
+    self.schemeBrowserSelector.addItem('%s. Spinner Browser' % 1)
+    schemeSliceLayout.addRow("Browser Type:", self.schemeBrowserSelector)
     
-    self.tempButton = qt.QPushButton("Temp")
-    connectorLayout.addRow(self.tempButton)    
+    self.browserButton = qt.QPushButton("Open Browser")
+    connectorLayout.addRow(self.browserButton)  
+    
+    self.updateButton = qt.QPushButton("Update")
+    connectorLayout.addRow(self.updateButton)    
     
     # Debug box
     self.textBox = qt.QTextEdit()
@@ -72,7 +78,8 @@ class DicomExplorerWidget:
     self.startButton.connect('clicked(bool)', self.onStart)
     self.stopButton.connect('clicked(bool)', self.onStop)
     self.browserButton.connect('clicked(bool)', self.onOpenBrowser)
-    self.tempButton.connect('clicked(bool)', self.onTemp)   
+
+    self.updateButton.connect('clicked(bool)', self.onUpdate)   
     
     # Instantiate timer
     self.timer = qt.QTimer()
@@ -92,14 +99,23 @@ class DicomExplorerWidget:
     self.timer.stop()
 
   def onOpenBrowser(self):
-    self.browser = Widgets.DicomExplorerBrowser(self.parent)
-    pal = self.browser.palette
-    pal.setColor(self.browser.backgroundRole(), qt.QColor(20,20,20))
-    self.browser.setPalette(pal)
-    #self.browser.setWindowFlags(qt.Qt.FramelessWindowHint)
-    self.browser.show()
-    
-  def onTemp(self):
+    type = self.schemeBrowserSelector.currentIndex
+    if type == 1:
+      self.browser = Widgets.DicomExplorerBrowser(self.parent)
+      pal = self.browser.palette
+      pal.setColor(self.browser.backgroundRole(), qt.QColor(20,20,20))
+      self.browser.setPalette(pal)
+      #self.browser.setWindowFlags(not qt.Qt.WindowStaysOnTopHint)
+      self.browser.show()
+    else:
+      self.browser = Widgets.DicomExplorerBrowser(self.parent)
+      pal = self.browser.palette
+      pal.setColor(self.browser.backgroundRole(), qt.QColor(20,20,20))
+      self.browser.setPalette(pal)
+      #self.browser.setWindowFlags(not qt.Qt.WindowStaysOnTopHint)
+      self.browser.show()
+      
+  def onUpdate(self):
     self.browser.populateBrowser()    
   
   def extended_fingers(self, fingerList):
@@ -128,9 +144,8 @@ class DicomExplorerWidget:
     lastFrameLeftFingers = self.extended_fingers(lastFrame.hands.leftmost.fingers)
   
     if (len(frame.hands) == 1 and len(extendedFrameLeftFingers) <= 2 and len(extendedFrameLeftFingers) > 0 and len(lastFrameLeftFingers) <= 2 and frame.hands.leftmost.confidence >= 0.2):
-      self.browser.scrollBrowser(frame.hands.leftmost.fingers.frontmost.tip_position.y - lastFrame.hands.leftmost.fingers.frontmost.tip_position.y)
+      self.browser.scrollBrowser(2*(frame.hands.leftmost.fingers.frontmost.tip_position.y - lastFrame.hands.leftmost.fingers.frontmost.tip_position.y))
 
-    
 
 #
 # DicomExplorerLogic

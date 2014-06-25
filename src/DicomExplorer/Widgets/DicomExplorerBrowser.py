@@ -1,4 +1,5 @@
 from __main__ import math, vtk, qt, ctk, slicer
+import bisect
 import Widgets
 #
 # DicomExplorer
@@ -7,10 +8,11 @@ import Widgets
 class DicomExplorerBrowser(qt.QDialog):
   def __init__(self, parent):
     qt.QDialog.__init__(self, parent)
-    self.totalListSorted = []
+    self.dateList = []
     self.currentVolumeIDList = []
     self.offsetPortion = 0.1
     self.dateBlockDict = {}
+    self.selectedDate = 0
     self.setup()
   
   def updateBrowser(self):
@@ -30,6 +32,11 @@ class DicomExplorerBrowser(qt.QDialog):
   
   def setup(self):
     self.browserLayout = qt.QVBoxLayout(self) #change to whatever layout is suitable, is any layout suitable? maybe not, I don't know right now    
+    
+    self.fullscreenButton = qt.QPushButton("Fullscreen")
+    self.browserLayout.addWidget(self.fullscreenButton)
+    self.fullscreenButton.connect('clicked(bool)', self.onFullscreen)
+    
     self.scrollArea = qt.QScrollArea(self)
     self.scrollArea.setWidgetResizable(True)
     self.scrollArea.setHorizontalScrollBarPolicy(qt.Qt.ScrollBarAlwaysOff)
@@ -38,24 +45,23 @@ class DicomExplorerBrowser(qt.QDialog):
     self.viewport = qt.QWidget(self)
     self.scrollArea.setWidget(self.viewport)
     
-    self.scrollLayout = qt.QGridLayout(self.viewport)
+    self.scrollLayout = qt.QVBoxLayout(self.viewport)
     self.viewport.setLayout(self.scrollLayout)
     
-    self.tempLabel2 = qt.QLabel("testing")
+    self.tempLabel2 = qt.QLabel("<font color='white'> This is a widget added to this layout!")
     self.scrollLayout.addWidget(self.tempLabel2)
     
-    self.browserLayout.addWidget(self.scrollArea)
+    self.scrollLayout.addStretch(1)
     
-    #self.currentVolumeNodeList.append(slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1"))
-    #self.tempLabel2.setText("<font color='white'>" + slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1").GetAttribute("DICOM.patient") + "\n" + slicer.mrmlScene.GetNodeByID("vtkMRMLScalarVolumeNode1").GetAttribute("DICOM.date"))
+    self.browserLayout.addWidget(self.scrollArea)
     
     self.timer = qt.QTimer()
     self.timer.timeout.connect(self.updateBrowser)
     self.timer.start(750)
     #Start a qTimer for the update loop that animates thumbnails
 
-    
-
+  def onFullscreen(self):
+    self.showFullScreen()
     
   def populateBrowser(self):
     #Take in a list of scalar volume nodes that have DICOM data
@@ -71,12 +77,19 @@ class DicomExplorerBrowser(qt.QDialog):
         self.currentVolumeIDList.append(IDFirstSlice)
         date=scalarVolumeNode.GetAttribute("DICOM.date")
         time=scalarVolumeNode.GetAttribute("DICOM.time")
+        time = str(int(float(time)))
         description=scalarVolumeNode.GetAttribute("DICOM.modality")+"-"+scalarVolumeNode.GetAttribute("DICOM.seriesDescription")
         
         if date not in  self.dateBlockDict:
           dateBlock = Widgets.DicomExplorerDateBlock(self, date)
+          
+          bisect.insort(self.dateList,date)
+          self.dateList.sort(reverse=True)
+          
+          ind=self.dateList.index(date)
+          
           self.dateBlockDict[date] = dateBlock
-          self.scrollLayout.addWidget(dateBlock)
+          self.scrollLayout.insertWidget(ind+1,dateBlock)
         else:
           dateBlock = self.dateBlockDict[date]
         
@@ -87,12 +100,6 @@ class DicomExplorerBrowser(qt.QDialog):
         imageBlock.setDescription(description)
         
         dateBlock.loadImageBlock(time, imageBlock)
-        
-        #self.scrollLayout.addWidget(imageLabel)      
-
-        #totalList.append([date,time,scalarVolumeNode,imageLabel,description])
-        #self.GenerateBlock([date,time,scalarVolumeNode,imageLabel,description])
-      #self.totalListSorted=sorted(totalList,key = lambda x: (x[1], x[2]),reverse=True)
       
     #Compare with volumeNodeList here, can keep in Node format for the dicom data, but it might be less efficient
     #Add in any series that does not appear in self.currentVolmeNodeList

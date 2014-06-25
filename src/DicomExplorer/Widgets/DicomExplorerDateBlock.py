@@ -10,7 +10,10 @@ class DicomExplorerDateBlock(qt.QDialog):
         
     def setup(self,Date):
         self.dateLayout=qt.QHBoxLayout(self)
+        self.dateLayout.setAlignment(qt.Qt.AlignLeft)
         self.loadDate(Date)
+        self.dateLayout.addStretch(1)
+        #self.setLayout(self.dateLayout)
         
     def loadDate(self,Date):
         dateLabel=qt.QLabel()
@@ -25,4 +28,4 @@ class DicomExplorerDateBlock(qt.QDialog):
         self.listImageBlocks.append(imageBlock)
         self.dateLayout.insertWidget(ind+1,imageBlock)
         
-
+        
