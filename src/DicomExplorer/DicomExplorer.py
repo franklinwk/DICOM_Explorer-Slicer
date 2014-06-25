@@ -101,14 +101,14 @@ class DicomExplorerWidget:
   def onOpenBrowser(self):
     type = self.schemeBrowserSelector.currentIndex
     if type == 1:
-      self.browser = Widgets.DicomExplorerBrowser(self.parent)
+      self.browser = Widgets.DicomExplorerPointerBrowser(self.parent)
       pal = self.browser.palette
       pal.setColor(self.browser.backgroundRole(), qt.QColor(20,20,20))
       self.browser.setPalette(pal)
       #self.browser.setWindowFlags(not qt.Qt.WindowStaysOnTopHint)
       self.browser.show()
     else:
-      self.browser = Widgets.DicomExplorerBrowser(self.parent)
+      self.browser = Widgets.DicomExplorerSpinnerBrowser(self.parent)
       pal = self.browser.palette
       pal.setColor(self.browser.backgroundRole(), qt.QColor(20,20,20))
       self.browser.setPalette(pal)

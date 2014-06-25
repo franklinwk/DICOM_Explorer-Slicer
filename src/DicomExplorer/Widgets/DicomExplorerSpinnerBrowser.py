@@ -5,7 +5,7 @@ import Widgets
 # DicomExplorer
 #
 
-class DicomExplorerBrowser(qt.QDialog):
+class DicomExplorerSpinnerBrowser(qt.QDialog):
   def __init__(self, parent):
     qt.QDialog.__init__(self, parent)
     self.dateList = []
