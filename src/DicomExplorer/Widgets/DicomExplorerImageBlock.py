@@ -3,7 +3,9 @@ from __main__ import math, vtk, qt, ctk, slicer
 class DicomExplorerImageBlock(qt.QFrame):
   def __init__(self, parent):
     qt.QFrame.__init__(self, parent)
-    self.setFrameShape(qt.QFrame.Panel)
+    self.setFrameShape(qt.QFrame.NoFrame)
+    self.setFixedSize(qt.QSize(100, 120))
+    
     self.imageLabel = qt.QLabel()
     self.textLabel = qt.QLabel("<font color='55ff88'>empty</font>")
     self.description = ""

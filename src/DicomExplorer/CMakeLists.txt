@@ -14,6 +14,7 @@ set(MODULE_PYTHON_SCRIPTS
   Widgets/__init__
   Widgets/${MODULE_NAME}PointerBrowser
   Widgets/${MODULE_NAME}SpinnerBrowser
+  Widgets/${MODULE_NAME}SpinnerDateBlock
   Widgets/${MODULE_NAME}DateBlock
   Widgets/${MODULE_NAME}ImageBlock
   )
